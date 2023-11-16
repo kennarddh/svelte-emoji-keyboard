@@ -1,27 +1,34 @@
 <script lang="ts">
+	import Emoji from "./Emoji"
+
   let text=''
+  let index=-1
 
   $: console.log({text})
+  $: console.log({index})
+
+  const OnChange=(event:Event & { currentTarget: EventTarget & HTMLInputElement })=>{
+    text = event.currentTarget?.value.replaceAll(
+			/(:[^:]+:)/gi,
+			name => {
+        console.log({name})
+				index = event.currentTarget?.value.indexOf(name)
+
+				const emojiName = name.slice(1, -1).toLowerCase()
+
+				const findResult = Emoji.find(
+					({ name }) => name === emojiName
+				)?.emoji
+
+				return findResult ?? name
+			}
+		)
+  }
 </script>
 
 <main>
-  <input type="text" value={text} on:input={(event)=>text = event.currentTarget?.value}>
+  <input type="text" value={text} on:input={OnChange}>
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
 </style>
