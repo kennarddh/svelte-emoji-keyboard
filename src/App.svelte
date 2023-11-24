@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { afterUpdate } from "svelte"
 	import Emoji from "./Emoji"
 
 	let text=''
@@ -12,18 +13,15 @@
 		localStorage.setItem('lastUsedEmojis',JSON.stringify(lastUsed))
 	}
 
-	$: {
+	afterUpdate(() => {
 		console.log({index})
 
-		if (index === -1) {
-			inputElement?.setSelectionRange(
-				inputElement.value.length,
-				inputElement.value.length
-			)
-		}else{
+		if (index!==-1){
 			inputElement?.setSelectionRange(index, index)
 		}
-	}
+
+		index = -1
+	})
 
   	const OnChange=(event:Event & { currentTarget: EventTarget & HTMLInputElement })=>{
 		text = event.currentTarget?.value.replaceAll(
