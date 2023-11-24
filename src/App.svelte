@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { afterUpdate } from "svelte"
+	import { afterUpdate, tick } from "svelte"
 	import Emoji from "./Emoji"
 
 	let text=''
-	let index=-1
 	let inputElement:HTMLInputElement
 	let lastUsed:string[]=JSON.parse(localStorage.getItem('lastUsedEmojis') ?? '[]') ?? []
 
@@ -13,21 +12,23 @@
 		localStorage.setItem('lastUsedEmojis',JSON.stringify(lastUsed))
 	}
 
-	afterUpdate(() => {
-		console.log({index})
+	// afterUpdate(() => {
+	// 	console.log({index})
 
-		if (index!==-1){
-			inputElement?.setSelectionRange(index, index)
-		}
+	// 	if (index!==-1){
+	// 		inputElement?.setSelectionRange(index, index)
+	// 	}
 
-		index = -1
-	})
+	// 	index = -1
+	// })
 
-  	const OnChange=(event:Event & { currentTarget: EventTarget & HTMLInputElement })=>{
+  	const OnChange=async(event:Event & { currentTarget: EventTarget & HTMLInputElement })=>{
+		let index= -1
 		text = event.currentTarget?.value.replaceAll(
 			/(:[^:]+:)/gi,
 			name => {
 				index = event.currentTarget?.value.indexOf(name)+1
+
 				console.log({val:event.currentTarget?.value,name,index})
 
 				const emojiName = name.slice(1, -1).toLowerCase()
@@ -45,6 +46,12 @@
 			return findResult ?? name
 			}
 		)
+
+		if (index!==-1){
+		await tick()
+
+		inputElement?.setSelectionRange(index, index)
+		}
   	}
 </script>
 
