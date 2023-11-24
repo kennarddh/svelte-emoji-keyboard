@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { afterUpdate, tick } from "svelte"
-	import Emoji from "./Emoji"
+	import { afterUpdate, tick } from 'svelte'
+	import Emoji from './Emoji'
 
-	let text=''
-	let inputElement:HTMLInputElement
-	let lastUsed:string[]=JSON.parse(localStorage.getItem('lastUsedEmojis') ?? '[]') ?? []
+	let text = ''
+	let inputElement: HTMLInputElement
+	let lastUsed: string[] =
+		JSON.parse(localStorage.getItem('lastUsedEmojis') ?? '[]') ?? []
 
-	$: console.log({lastUsed})
+	$: console.log({ lastUsed })
 
 	$: {
-		localStorage.setItem('lastUsedEmojis',JSON.stringify(lastUsed))
+		localStorage.setItem('lastUsedEmojis', JSON.stringify(lastUsed))
 	}
 
 	// afterUpdate(() => {
@@ -22,43 +23,46 @@
 	// 	index = -1
 	// })
 
-  	const OnChange=async(event:Event & { currentTarget: EventTarget & HTMLInputElement })=>{
-		let index= -1
-		text = event.currentTarget?.value.replaceAll(
-			/(:[^:]+:)/gi,
-			name => {
-				index = event.currentTarget?.value.indexOf(name)+1
+	const OnChange = async (
+		event: Event & { currentTarget: EventTarget & HTMLInputElement }
+	) => {
+		let index = -1
+		text = event.currentTarget?.value.replaceAll(/(:[^:]+:)/gi, name => {
+			index = event.currentTarget?.value.indexOf(name) + 1
 
-				console.log({val:event.currentTarget?.value,name,index})
+			console.log({ val: event.currentTarget?.value, name, index })
 
-				const emojiName = name.slice(1, -1).toLowerCase()
+			const emojiName = name.slice(1, -1).toLowerCase()
 
-				const findResult = Emoji.find(
-					({ name }) => name === emojiName
-				)?.emoji
-				
+			const findResult = Emoji.find(
+				({ name }) => name === emojiName
+			)?.emoji
 
-			if (findResult){
-				if (lastUsed.length===10)lastUsed.shift()	
-				lastUsed=[...lastUsed, findResult]
+			if (findResult) {
+				if (lastUsed.length === 10) lastUsed.shift()
+				lastUsed = [...lastUsed, findResult]
 			}
 
 			return findResult ?? name
-			}
-		)
+		})
 
-		if (index!==-1){
-		await tick()
+		if (index !== -1) {
+			await tick()
 
-		inputElement?.setSelectionRange(index, index)
+			inputElement?.setSelectionRange(index, index)
 		}
-  	}
+	}
 </script>
 
 <main>
-  	<input type="text" value={text} on:input={OnChange} bind:this={inputElement}>
+	<input
+		type="text"
+		value={text}
+		on:input={OnChange}
+		bind:this={inputElement}
+	/>
 
-  	<div>
+	<div>
 		{#each lastUsed as lastUsedIter}
 			<p>{lastUsedIter}</p>
 		{/each}
